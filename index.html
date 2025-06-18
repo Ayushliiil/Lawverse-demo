@@ -1,13 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Lawverse</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
-  </head>
-  <body class="bg-white dark:bg-zinc-900 text-black dark:text-white">
-    <div id="root"></div>
-    <script type="module" src="./App.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>Lawverse – AI for Legal Help</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f0f0f;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #00ffd5;
+    }
+
+    p {
+      max-width: 80%;
+      text-align: center;
+      font-size: 1.2em;
+      color: #ccc;
+    }
+
+    .button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00ffd5;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background: #00bfa5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Lawverse ⚖️</h1>
+  <p>Your free legal AI assistant to understand and use law to your benefit.</p>
+  <button class="button" onclick="alert('Coming Soon: Legal Chatbot + Tools')">Try Now</button>
+</body>
 </html>
