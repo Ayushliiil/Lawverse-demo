@@ -3,19 +3,26 @@
 import { useState, useEffect } from "react";
 import { Paperclip, Mic, Plus, Menu } from "lucide-react";
 
+type Message = {
+  sender: "user" | "ai";
+  text: string;
+};
+
 export default function ChatPage() {
-  const [messages, setMessages] = useState<{ sender: "user" | "ai"; text: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = () => {
     if (input.trim() === "") return;
-    const userMsg = { sender: "user", text: input };
+
+    const userMsg: Message = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+
     setTimeout(() => {
-      const aiReply = { sender: "ai", text: "This is a demo response from Lawverse AI." };
+      const aiReply: Message = { sender: "ai", text: "This is a demo response from Lawverse AI." };
       setMessages((prev) => [...prev, aiReply]);
       setIsLoading(false);
     }, 1500);
@@ -53,10 +60,10 @@ export default function ChatPage() {
         ))}
 
         {isLoading && (
-          <div className="mr-auto bg-zinc-800 text-zinc-400 text-sm px-4 py-3 rounded-lg w-fit font-mono animate-pulse">
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1"></span>
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1"></span>
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
+          <div className="mr-auto bg-zinc-800 text-zinc-400 text-sm px-4 py-3 rounded-lg w-fit font-mono animate-pulse flex gap-1">
+            <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce [animation-delay:.1s]" />
+            <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce [animation-delay:.2s]" />
+            <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce [animation-delay:.3s]" />
           </div>
         )}
       </div>
