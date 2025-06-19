@@ -16,13 +16,21 @@ export default function ChatUI() {
     setMessages([...messages, userMessage, botMessage]);
     setInput('');
   };
+// components/ChatUI.tsx
+"use client";
+import React from "react";
+
+export default function ChatUI() {
+  // Your logic here
 
   return (
     <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-xl max-w-xl mx-auto mt-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">💼 Lawverse™ AI</h2>
-        <button
-          onClick={() => document.documentElement.classList.toggle('dark')}
+        <button>Clear</button>
+      </div>
+      {/* Add the rest of your UI here */
+      onClick={() => document.documentElement.classList.toggle('dark')}
           className="text-sm px-3 py-1 border rounded-full"
         >
           Toggle Theme
@@ -71,6 +79,11 @@ export default function ChatUI() {
           Send
         </button>
       </div>
+    </div>
+  );
+}
+
+      }
     </div>
   );
 }
