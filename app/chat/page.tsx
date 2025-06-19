@@ -1,22 +1,28 @@
-// app/chat/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { Paperclip, Mic, Plus, Menu } from "lucide-react";
+import { Paperclip, Mic, Menu } from "lucide-react";
+
+type Message = { sender: "user" | "ai"; text: string };
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<{ sender: "user" | "ai"; text: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = () => {
     if (input.trim() === "") return;
-    const userMsg = { sender: "user", text: input };
+
+    const userMsg: Message = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+
     setTimeout(() => {
-      const aiReply = { sender: "ai", text: "This is a demo response from Lawverse AI." };
+      const aiReply: Message = {
+        sender: "ai",
+        text: "This is a demo response from Lawverse AI.",
+      };
       setMessages((prev) => [...prev, aiReply]);
       setIsLoading(false);
     }, 1500);
@@ -24,22 +30,28 @@ export default function ChatPage() {
 
   useEffect(() => {
     const chatContainer = document.getElementById("chat-container");
-    if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
   }, [messages, isLoading]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+    <div className="h-screen flex flex-col bg-zinc-950 text-white">
       <header className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
         <button className="text-zinc-400 hover:text-white">
           <Menu size={22} />
         </button>
-        <h1 className="text-xl font-semibold">Lawverse™ AI</h1>
+        <h1 className="text-lg md:text-xl font-semibold">Lawverse™ AI</h1>
         <button className="text-sm px-3 py-1 rounded-md border border-zinc-700 hover:bg-zinc-800 transition">
           New Chat
         </button>
       </header>
 
-      <div id="chat-container" className="flex-1 overflow-y-auto p-4 space-y-4 max-w-2xl mx-auto w-full">
+      <div
+        id="chat-container"
+        className="flex-1 overflow-y-auto p-4 space-y-4 w-full max-w-3xl mx-auto"
+        style={{ scrollBehavior: "smooth" }}
+      >
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -54,17 +66,21 @@ export default function ChatPage() {
         ))}
 
         {isLoading && (
-          <div className="mr-auto bg-zinc-800 text-zinc-400 text-sm px-4 py-3 rounded-lg w-fit font-mono animate-pulse">
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1"></span>
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1"></span>
+          <div className="mr-auto bg-zinc-800 text-zinc-400 text-sm px-4 py-3 rounded-lg w-fit font-mono animate-pulse flex gap-1">
+            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
+            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
             <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
           </div>
         )}
       </div>
 
-      <footer className="p-4 border-t border-zinc-800 flex items-center gap-3 max-w-2xl mx-auto w-full">
-        <button className="text-zinc-400 hover:text-white"><Mic size={20} /></button>
-        <button className="text-zinc-400 hover:text-white"><Paperclip size={20} /></button>
+      <footer className="p-4 border-t border-zinc-800 flex items-center gap-3 max-w-3xl mx-auto w-full bg-zinc-950 sticky bottom-0">
+        <button className="text-zinc-400 hover:text-white">
+          <Mic size={20} />
+        </button>
+        <button className="text-zinc-400 hover:text-white">
+          <Paperclip size={20} />
+        </button>
         <input
           className="flex-1 p-3 rounded-xl bg-zinc-800 text-white border border-zinc-700 focus:outline-none"
           placeholder="Type your legal question..."
