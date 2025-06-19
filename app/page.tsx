@@ -1,6 +1,6 @@
 'use client';
 
-import ChatUI from '../components/ChatUI'; // Use relative path to test, safe method
+import ChatUI from '@/components/ChatUI'; // Use relative path to test, safe method
 
 export default function Home() {
   return (
