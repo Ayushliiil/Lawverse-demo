@@ -1,26 +1,17 @@
-'use client';
-import ChatUI from '../components/ChatUI';
+"use client";
+
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-white to-zinc-100 dark:from-zinc-900 dark:to-black flex flex-col items-center justify-center p-6">
-      <h1 className="text-4xl md:text-5xl font-bold text-center text-zinc-900 dark:text-white mb-6">
-        Welcome to <span className="text-blue-600">Lawverse™</span>
-      </h1>
-      <p className="text-lg text-center text-zinc-600 dark:text-zinc-300 mb-8 max-w-xl">
+    <main className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center p-8">
+      <h1 className="text-4xl font-bold mb-4">Welcome to <span className="text-blue-400">Lawverse™</span></h1>
+      <p className="text-lg text-zinc-300 mb-6 text-center max-w-xl">
         Your AI-powered legal assistant — helping people understand and use the law to their benefit.
       </p>
-
-      <button
-        onClick={() => document.getElementById('lawchat')?.scrollIntoView({ behavior: 'smooth' })}
-        className="bg-blue-600 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-blue-700 transition mb-12"
-      >
-        🚀 Try Now
-      </button>
-
-      <div id="lawchat" className="w-full max-w-2xl">
-        <ChatUI />
-      </div>
+      <Link href="/chat" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow">
+         Try Now
+      </Link>
     </main>
   );
 }
