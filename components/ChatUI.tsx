@@ -1,89 +1,58 @@
-'use client';
-
-import { useState, useRef } from 'react';
-
-export default function ChatUI() {
-  const [messages, setMessages] = useState([
-    { type: 'bot', text: '👋 Hi! I’m Lawverse — your AI-powered legal assistant.' }
-  ]);
-  const [input, setInput] = useState('');
-  const fileInputRef = useRef(null);
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const userMessage = { type: 'user', text: input.trim() };
-    const botMessage = { type: 'bot', text: '🤖 This is a demo reply from Lawverse AI.' };
-    setMessages([...messages, userMessage, botMessage]);
-    setInput('');
-  };
-// components/ChatUI.tsx
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 export default function ChatUI() {
-  // Your logic here
+  const [messages, setMessages] = useState<string[]>([]);
+  const [input, setInput] = useState("");
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    const userMessage = `🧑‍⚖️ You: ${input}`;
+    const botResponse = "🤖 Lawverse AI: This is a dummy response for now.";
+
+    setMessages((prev) => [...prev, userMessage, botResponse]);
+    setInput("");
+  };
 
   return (
     <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-xl max-w-xl mx-auto mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">💼 Lawverse™ AI</h2>
-        <button>Clear</button>
-      </div>
-      {/* Add the rest of your UI here */
-      onClick={() => document.documentElement.classList.toggle('dark')}
-          className="text-sm px-3 py-1 border rounded-full"
-        >
-          Toggle Theme
-        </button>
-      </div>
-      <div className="h-64 overflow-y-auto bg-zinc-100 dark:bg-zinc-800 p-3 rounded-lg mb-3">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={\`
-              mb-2 p-2 rounded-lg \${msg.type === 'user'
-                ? 'bg-blue-500 text-white self-end ml-auto max-w-xs'
-                : 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white self-start mr-auto max-w-xs'}
-            \`}
-          >
-            {msg.text}
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">
+          💼 Lawverse™ AI
+        </h2>
         <button
-          className="bg-gray-200 dark:bg-zinc-700 p-2 rounded-full"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => setMessages([])}
+          className="text-sm text-red-500 hover:underline"
         >
-          📎
+          Clear
         </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,audio/*"
-          hidden
-          onChange={() => alert('📤 Upload received (demo only)')}
-        />
+      </div>
+
+      <div className="h-64 overflow-y-auto mb-4 space-y-2 border p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm text-black dark:text-white">
+        {messages.length === 0 ? (
+          <p className="text-zinc-400 italic">Ask anything legal, anytime.</p>
+        ) : (
+          messages.map((msg, idx) => <div key={idx}>{msg}</div>)
+        )}
+      </div>
+
+      <div className="flex items-center space-x-2">
         <input
           type="text"
-          className="flex-1 px-4 py-2 border rounded-lg dark:bg-zinc-800 dark:text-white"
           placeholder="Type your legal question..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          className="flex-1 px-3 py-2 rounded-xl border dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-700 dark:text-white"
         />
         <button
-          onClick={sendMessage}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+          onClick={handleSend}
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
         >
           Send
         </button>
       </div>
-    </div>
-  );
-}
-
-      }
     </div>
   );
 }
