@@ -1,15 +1,12 @@
-import './globals.css';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Lawverse™',
-  description: 'AI-powered legal assistant',
+export const metadata = {
+  title: "Lawverse™ - AI Legal Agent",
+  description: "Your AI-powered legal assistant",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-zinc-950 text-white">{children}</body>
     </html>
   );
 }
