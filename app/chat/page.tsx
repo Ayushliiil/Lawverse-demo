@@ -1,100 +1,63 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Paperclip, Mic, Menu } from "lucide-react";
-
-type Message = { sender: "user" | "ai"; text: string };
+import { useState } from "react";
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState([
+    { sender: "ai", text: "Hi, I’m your Lawverse™ legal assistant. How can I help you today?" }
+  ]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = () => {
+  const sendMessage = () => {
     if (input.trim() === "") return;
-
-    const userMsg: Message = { sender: "user", text: input };
+    const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    setIsLoading(true);
 
+    // Fake AI reply for demo
     setTimeout(() => {
-      const aiReply: Message = {
-        sender: "ai",
-        text: "This is a demo response from Lawverse AI.",
-      };
-      setMessages((prev) => [...prev, aiReply]);
-      setIsLoading(false);
-    }, 1500);
+      const aiMsg = { sender: "ai", text: "Thanks for your message. We'll assist you shortly." };
+      setMessages((prev) => [...prev, aiMsg]);
+    }, 1000);
   };
 
-  useEffect(() => {
-    const chatContainer = document.getElementById("chat-container");
-    if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-  }, [messages, isLoading]);
-
   return (
-    <div className="h-screen flex flex-col bg-zinc-950 text-white">
-      <header className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
-        <button className="text-zinc-400 hover:text-white">
-          <Menu size={22} />
-        </button>
-        <h1 className="text-lg md:text-xl font-semibold">Lawverse™ AI</h1>
-        <button className="text-sm px-3 py-1 rounded-md border border-zinc-700 hover:bg-zinc-800 transition">
-          New Chat
-        </button>
-      </header>
+    <main className="min-h-screen bg-zinc-950 text-white flex flex-col">
+      <div className="bg-zinc-900 px-6 py-4 shadow-md text-xl font-semibold">
+        Lawverse™ Chat
+      </div>
 
-      <div
-        id="chat-container"
-        className="flex-1 overflow-y-auto p-4 space-y-4 w-full max-w-3xl mx-auto"
-        style={{ scrollBehavior: "smooth" }}
-      >
-        {messages.map((msg, index) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((msg, i) => (
           <div
-            key={index}
-            className={`p-3 rounded-lg max-w-[80%] text-sm ${
+            key={i}
+            className={`max-w-[75%] px-4 py-3 rounded-xl text-sm md:text-base ${
               msg.sender === "user"
-                ? "ml-auto bg-blue-600 text-white"
-                : "mr-auto bg-zinc-800 text-zinc-100 font-mono"
+                ? "bg-blue-600 text-white self-end ml-auto"
+                : "bg-zinc-800 text-zinc-100 self-start mr-auto"
             }`}
           >
             {msg.text}
           </div>
         ))}
-
-        {isLoading && (
-          <div className="mr-auto bg-zinc-800 text-zinc-400 text-sm px-4 py-3 rounded-lg w-fit font-mono animate-pulse flex gap-1">
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
-            <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full"></span>
-          </div>
-        )}
       </div>
 
-      <footer className="p-4 border-t border-zinc-800 flex items-center gap-3 max-w-3xl mx-auto w-full bg-zinc-950 sticky bottom-0">
-        <button className="text-zinc-400 hover:text-white">
-          <Mic size={20} />
-        </button>
-        <button className="text-zinc-400 hover:text-white">
-          <Paperclip size={20} />
-        </button>
+      <div className="p-4 bg-zinc-900 flex gap-2 items-center">
         <input
-          className="flex-1 p-3 rounded-xl bg-zinc-800 text-white border border-zinc-700 focus:outline-none"
-          placeholder="Type your legal question..."
+          type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          placeholder="Type your legal question..."
+          className="flex-1 px-4 py-2 rounded-xl bg-zinc-800 text-white border border-zinc-700 outline-none"
         />
         <button
-          onClick={handleSend}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl text-sm font-semibold"
+          onClick={sendMessage}
+          className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium"
         >
           Send
         </button>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
