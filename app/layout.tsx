@@ -1,3 +1,4 @@
+import './globals.css';
 export const metadata = {
   title: "Lawverse™ AI",
   description: "Your personal legal assistant.",
