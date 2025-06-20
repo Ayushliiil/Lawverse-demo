@@ -1,121 +1,126 @@
 'use client';
 
-import { useState } from 'react';
-import { Mic, Image as ImageIcon, FileText, ArrowRight, ThumbsUp, ThumbsDown, Copy, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Send, UploadCloud, Mic, Image, FileText, RefreshCw, ThumbsUp, ThumbsDown, Copy, Home } from 'lucide-react';
 
-// Define strict message type
-const MESSAGE_TYPE = {
-  USER: 'user',
-  AI: 'ai',
-} as const;
+const WELCOME_OPTIONS = ["Criminal Law", "Startup Law", "Property Law", "Cyber Law", "Divorce Law"];
 
-type Message = {
-  sender: keyof typeof MESSAGE_TYPE;
-  text: string;
-};
-
-export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: 'AI', text: "I'm lawverse™ your legal assistant." },
-  ]);
+const ChatPage = () => {
+  const [messages, setMessages] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('lawverse-chat');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const chatRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem('lawverse-chat', JSON.stringify(messages));
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSend = () => {
     if (input.trim() === '') return;
-    const userMsg: Message = { sender: 'USER', text: input };
-    setMessages((prev) => [...prev, userMsg]);
+    const userMsg = { sender: 'user', text: input };
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
-
     setTimeout(() => {
-      const aiReply: Message = {
-        sender: 'AI',
-        text: `You said: \"${input}\". How can I help you further?`,
-      };
-      setMessages((prev) => [...prev, aiReply]);
+      const aiReply = { sender: 'ai', text: `Here's some information about ${userMsg.text}.` };
+      setMessages(prev => [...prev, aiReply]);
       setIsLoading(false);
     }, 1000);
   };
 
+  const handleWelcomeClick = (text) => {
+    setInput(text);
+  };
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return (
-    <main className="min-h-screen bg-[#f3f4f6] flex flex-col">
-      <div className="p-4 border-b shadow bg-white flex justify-between items-center">
-        <h1 className="text-lg font-semibold text-[#3b82f6]">Lawverse™ Chat</h1>
-        <button className="text-sm text-gray-500 hover:underline">Home</button>
-      </div>
+    <div className="flex flex-col min-h-screen bg-[#f4f7f9]">
+      <header className="flex items-center justify-between px-6 py-4 shadow-md bg-[#002b36] text-white">
+        <h1 className="text-xl font-bold">Lawverse™</h1>
+        <button className="text-sm bg-white text-[#002b36] px-4 py-1 rounded hover:bg-gray-200 flex items-center">
+          <Home className="w-4 h-4 mr-1" /> Home
+        </button>
+      </header>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`w-full flex ${msg.sender === 'USER' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-xl px-4 py-3 shadow text-sm leading-relaxed relative ${
-                msg.sender === 'USER' ? 'bg-[#e0f2fe] text-right' : 'bg-white text-left'
-              }`}
-            >
-              {msg.text}
-              {msg.sender === 'AI' && (
-                <div className="flex gap-2 mt-2 text-gray-400 text-xs">
-                  <button><ThumbsUp size={16} /></button>
-                  <button><ThumbsDown size={16} /></button>
-                  <button><Copy size={16} /></button>
-                  <button><RefreshCw size={16} /></button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {isLoading && (
-          <div className="w-full flex justify-start">
-            <div className="max-w-[80%] bg-white px-4 py-3 rounded-xl shadow text-sm">
-              Lawverse™ is thinking...
+      <main className="flex-1 flex flex-col px-4 py-2 max-w-3xl mx-auto w-full">
+        {messages.length === 0 && (
+          <div className="text-center mt-10">
+            <h2 className="text-xl mb-4 font-semibold text-[#002b36]">How can I assist you today?</h2>
+            <div className="flex flex-wrap justify-center gap-2">
+              {WELCOME_OPTIONS.map(option => (
+                <button
+                  key={option}
+                  className="bg-[#002b36] text-white px-4 py-2 rounded-full text-sm hover:opacity-90"
+                  onClick={() => handleWelcomeClick(option)}
+                >
+                  {option}
+                </button>
+              ))}
             </div>
           </div>
         )}
-      </div>
 
-      <div className="p-4 bg-white border-t shadow flex flex-col gap-3">
-        <div className="flex gap-2 flex-wrap">
-          {["Criminal Law", "Property Law", "Civil Rights", "Startup Law"].map((text) => (
-            <button
-              key={text}
-              onClick={() => setMessages((prev) => [...prev, { sender: 'USER', text }])}
-              className="px-3 py-1 rounded-full bg-gray-200 text-sm hover:bg-gray-300"
+        <div ref={chatRef} className="flex-1 overflow-y-auto mt-4 space-y-4 p-2">
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`max-w-[80%] px-4 py-3 rounded-2xl shadow ${
+                msg.sender === 'user'
+                  ? 'self-end bg-[#dbeafe] text-right'
+                  : 'self-start bg-white border text-left'
+              } animate-fade-in`}
             >
-              {text}
-            </button>
+              <p className="text-sm text-gray-800 whitespace-pre-wrap">{msg.text}</p>
+              {msg.sender === 'ai' && (
+                <div className="flex gap-2 mt-2 text-gray-400 text-xs">
+                  <button onClick={() => handleCopy(msg.text)}><Copy size={14} /></button>
+                  <button><ThumbsUp size={14} /></button>
+                  <button><ThumbsDown size={14} /></button>
+                  <button><RefreshCw size={14} /></button>
+                </div>
+              )}
+            </div>
           ))}
+          {isLoading && (
+            <div className="self-start bg-white border max-w-[80%] px-4 py-3 rounded-2xl shadow animate-pulse">
+              <p className="text-sm text-gray-400">Typing...</p>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center mt-4 space-x-2">
+          <button className="p-2 rounded-full bg-[#002b36] text-white hover:opacity-90"><Mic size={20} /></button>
+          <button className="p-2 rounded-full bg-[#002b36] text-white hover:opacity-90"><Image size={20} /></button>
+          <button className="p-2 rounded-full bg-[#002b36] text-white hover:opacity-90"><UploadCloud size={20} /></button>
           <input
+            className="flex-1 border rounded-full px-4 py-2 outline-none"
+            placeholder="Type your message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            className="flex-1 border rounded-full px-4 py-2 focus:outline-none"
-            placeholder="Ask me any legal question..."
           />
           <button
             onClick={handleSend}
-            className="bg-[#3b82f6] text-white rounded-full p-2"
+            className="bg-[#002b36] text-white px-4 py-2 rounded-full hover:bg-[#01424f]"
           >
-            <ArrowRight />
-          </button>
-          <button className="p-2 text-gray-500">
-            <Mic />
-          </button>
-          <button className="p-2 text-gray-500">
-            <ImageIcon />
-          </button>
-          <button className="p-2 text-gray-500">
-            <FileText />
+            <Send size={20} />
           </button>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
-        }
+};
+
+export default ChatPage;
