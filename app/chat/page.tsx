@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([
-    { sender: "ai", text: "Hi, I’m your Lawverse™ legal assistant. How can I help you today?" }
+    { sender: "ai", text: "Hi, I’m Lawverse™ your legal assistant. How can I help you today?" }
   ]);
   const [input, setInput] = useState("");
 
