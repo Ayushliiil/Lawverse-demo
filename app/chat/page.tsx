@@ -1,117 +1,142 @@
-/* Updated Chat UI with Lawverse™ brand colors */
 'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaMicrophone, FaUpload, FaFilePdf, FaPlus, FaArrowLeft } from 'react-icons/fa';
-import { FiTrash2 } from 'react-icons/fi';
-import { BsStars, BsArrowRepeat } from 'react-icons/bs';
+import {
+  FaPaperPlane,
+  FaMicrophone,
+  FaUpload,
+  FaFilePdf,
+  FaBars,
+} from 'react-icons/fa';
+import { BsStars } from 'react-icons/bs';
 
-const messagesMock = [
-  { sender: 'ai', text: 'How can I assist you today?' }
-];
-
-export default function ChatPage() {
-  const [messages, setMessages] = useState(messagesMock);
+const ChatPage = () => {
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   const handleSend = () => {
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
-    setMessages(prev => [...prev, userMessage]);
+    const aiMessage = {
+      sender: 'ai',
+      text: 'Thanks for your message! Lawverse™ will reply soon...',
+    };
+    setMessages((prev) => [...prev, userMessage, aiMessage]);
     setInput('');
-    setIsLoading(true);
-
-    setTimeout(() => {
-      const aiMessage = {
-        sender: 'ai',
-        text: `You said: "${userMessage.text}". Here’s a legal insight...`
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1000);
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
+  const initialOptions = [
+    'Criminal Law',
+    'Startup Law',
+    'Property Law',
+    'Fundraising Legal Help',
+  ];
+
+  const insertOption = (text: string) => {
+    setInput(text);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between p-4 bg-[#0F172A] shadow-md">
-        <button className="flex items-center gap-2 text-white hover:text-blue-400">
-          <FaArrowLeft />
-          <span>Back</span>
-        </button>
-        <h1 className="text-xl font-bold text-blue-400">Lawverse™ Chat</h1>
-        <button className="hover:text-red-400"><FiTrash2 /></button>
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0f24] to-[#101628] text-white flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1f30] bg-[#0e132b] shadow-md">
+        <div className="flex items-center space-x-2 text-white">
+          <FaBars size={20} />
+          <span className="text-sm font-semibold">Menu</span>
+        </div>
+        <div className="text-white font-semibold text-lg tracking-wide">
+          Lawverse™ Chat
+        </div>
+        <BsStars size={20} className="text-blue-300" />
       </div>
 
-      {/* Chat Box */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`max-w-xl p-3 rounded-xl text-sm leading-relaxed shadow-md ${
-              msg.sender === 'user'
-                ? 'bg-[#1E293B] self-end ml-auto text-right'
-                : 'bg-[#1E40AF] self-start text-left'
-            }`}
-          >
-            {msg.text}
+      {/* Prompt + Options */}
+      {messages.length === 0 && (
+        <div className="text-center py-10 px-4">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#27c4ff] to-[#4a8df9] text-transparent bg-clip-text animate-pulse mb-6">
+            How can I assist you?
+          </h1>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 justify-center px-4">
+            {initialOptions.map((opt, idx) => (
+              <button
+                key={idx}
+                onClick={() => insertOption(opt)}
+                className="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-xl backdrop-blur-md transition-all duration-300"
+              >
+                {opt}
+              </button>
+            ))}
           </div>
-        ))}
-        {isLoading && (
-          <div className="bg-[#1E40AF] p-3 rounded-xl text-sm max-w-xs animate-pulse">
-            Lawverse™ is typing...
-          </div>
-        )}
-        <div ref={messagesEndRef}></div>
-      </div>
-
-      {/* Predefined Buttons */}
-      {messages.length === 1 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-[#0F172A] text-white">
-          {['Criminal Law', 'Startup Law', 'Property Law', 'Fundraising Law'].map(topic => (
-            <button
-              key={topic}
-              onClick={() => setInput(topic)}
-              className="bg-[#1E293B] hover:bg-blue-700 px-3 py-2 rounded-xl text-sm shadow"
-            >
-              {topic}
-            </button>
-          ))}
         </div>
       )}
 
-      {/* Chat Input Area */}
-      <div className="bg-[#0F172A] p-4 flex items-center gap-2">
-        {/* Left Buttons */}
-        <div className="flex gap-2 text-blue-400">
-          <button><FaUpload /></button>
-          <button><FaFilePdf /></button>
-          <button><FaMicrophone /></button>
+      {/* Messages */}
+      <div
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth"
+      >
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex ${
+              msg.sender === 'user' ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            <div
+              className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow ${
+                msg.sender === 'user'
+                  ? 'bg-[#2a5ab9] text-white'
+                  : 'bg-[#1e1f2e] text-gray-200'
+              }`}
+            >
+              {msg.text}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="bg-[#0f1224] border-t border-[#1a1f30] px-4 py-3 flex items-center space-x-3">
+        {/* Left icons */}
+        <div className="flex space-x-3 items-center">
+          <label className="cursor-pointer">
+            <FaUpload className="text-blue-400 hover:text-blue-500" size={18} />
+            <input type="file" hidden />
+          </label>
+          <button>
+            <FaMicrophone className="text-blue-400 hover:text-blue-500" size={18} />
+          </button>
+          <button>
+            <FaFilePdf className="text-blue-400 hover:text-blue-500" size={18} />
+          </button>
         </div>
 
-        {/* Input */}
+        {/* Input field */}
         <input
           type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSend()}
           placeholder="Type your message..."
-          className="flex-1 rounded-xl bg-[#1E293B] text-white px-4 py-2 outline-none border border-[#334155]"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          className="flex-1 bg-[#1c1e2f] text-white placeholder-gray-400 px-4 py-2 rounded-full focus:outline-none"
         />
 
-        {/* Send Button */}
+        {/* Send button */}
         <button
           onClick={handleSend}
-          className="text-blue-500 hover:text-blue-300 text-xl"
+          className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-all duration-300"
         >
-          <FaPaperPlane />
+          <FaPaperPlane size={16} />
         </button>
       </div>
     </div>
   );
-          }
+};
+
+export default ChatPage;
