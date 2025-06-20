@@ -1,5 +1,5 @@
 /* Updated Chat UI with Lawverse™ brand colors */
-
+'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaMicrophone, FaUpload, FaFilePdf, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { FiTrash2 } from 'react-icons/fi';
