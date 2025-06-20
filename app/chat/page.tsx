@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Mic, Image, Upload, RefreshCcw, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Mic, Image, Upload, RefreshCcw, Copy, ThumbsUp, ThumbsDown, Send } from 'lucide-react';
 
+// Define type
 type Message = {
   sender: 'user' | 'ai';
   text: string;
@@ -16,13 +17,11 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Load previous messages from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('lawverse_chat');
     if (stored) setMessages(JSON.parse(stored));
   }, []);
 
-  // Save messages to localStorage
   useEffect(() => {
     localStorage.setItem('lawverse_chat', JSON.stringify(messages));
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -36,7 +35,6 @@ export default function ChatPage() {
     setInput('');
     setIsLoading(true);
 
-    // Simulate AI response
     setTimeout(() => {
       const aiMsg: Message = {
         sender: 'ai',
@@ -48,17 +46,17 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="bg-[#f6f8fa] min-h-screen flex flex-col px-2 md:px-10 pt-6 overflow-x-hidden">
+    <div className="bg-[#f4f6fc] min-h-screen flex flex-col px-2 md:px-10 pt-6 overflow-x-hidden">
       <div className="max-w-3xl mx-auto w-full">
         {messages.length === 0 && (
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-[#002b36] mb-3">How can I assist you?</h2>
+            <h2 className="text-2xl font-semibold text-[#031926] mb-3">How can I assist you?</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {presetPrompts.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => setInput(prompt)}
-                  className="bg-[#002b36] text-white px-4 py-2 rounded-full text-sm shadow hover:bg-opacity-90"
+                  className="bg-[#031926] text-white px-4 py-2 rounded-full text-sm shadow hover:bg-opacity-90"
                 >
                   {prompt}
                 </button>
@@ -71,15 +69,13 @@ export default function ChatPage() {
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`flex ${
-                msg.sender === 'user' ? 'justify-end' : 'justify-start'
-              }`}
+              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] rounded-xl p-4 shadow-sm text-sm whitespace-pre-wrap ${
                   msg.sender === 'user'
-                    ? 'bg-[#002b36] text-white rounded-tr-none'
-                    : 'bg-white text-[#002b36] rounded-tl-none border'
+                    ? 'bg-[#031926] text-white rounded-tr-none'
+                    : 'bg-[#e0e9f1] text-[#031926] rounded-tl-none border'
                 }`}
               >
                 {msg.text}
@@ -99,23 +95,24 @@ export default function ChatPage() {
 
         {/* Input Area */}
         <div className="fixed bottom-4 left-0 w-full px-4">
-          <div className="max-w-3xl mx-auto flex items-center bg-white shadow rounded-full border px-4 py-2">
+          <div className="max-w-3xl mx-auto flex items-center bg-white shadow-md rounded-full border px-4 py-2 gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              className="flex-1 outline-none text-[#002b36] placeholder:text-gray-400"
+              className="flex-1 outline-none text-[#031926] placeholder:text-gray-500 text-sm"
               placeholder="Type your message..."
             />
-            <div className="flex gap-2 ml-2 text-[#002b36]">
+            <div className="flex gap-2 text-[#031926]">
               <button title="Voice"><Mic size={20} /></button>
               <button title="Image"><Image size={20} /></button>
               <button title="Upload File"><Upload size={20} /></button>
+              <button title="Send" onClick={handleSend}><Send size={20} className="text-[#031926]" /></button>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-          }
+                  }
