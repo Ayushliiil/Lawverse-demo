@@ -1,40 +1,22 @@
-'use client';
+/* Updated Chat UI with Lawverse™ brand colors */
 
-import { useState, useEffect, useRef } from 'react';
-import { FaRegPaperPlane, FaMicrophone, FaFilePdf, FaImage, FaRegCopy, FaThumbsUp, FaThumbsDown, FaPlus, FaBars } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from 'react';
+import { FaPaperPlane, FaMicrophone, FaUpload, FaFilePdf, FaPlus, FaArrowLeft } from 'react-icons/fa';
+import { FiTrash2 } from 'react-icons/fi';
+import { BsStars, BsArrowRepeat } from 'react-icons/bs';
+
+const messagesMock = [
+  { sender: 'ai', text: 'How can I assist you today?' }
+];
 
 export default function ChatPage() {
+  const [messages, setMessages] = useState(messagesMock);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const initialSuggestions = [
-    'Criminal Law',
-    'Startup Law',
-    'Property Dispute',
-    'Legal Drafting',
-    'Consumer Rights'
-  ];
-
-  const lawverseBlue = '#1B4FFF';
-  const lawverseDark = '#0B0F1A';
-  const lawverseBg = '#F4F8FF';
-  const lawverseText = '#1A1A1A';
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const sendMessage = () => {
+  const handleSend = () => {
     if (!input.trim()) return;
-
     const userMessage = { sender: 'user', text: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -43,112 +25,93 @@ export default function ChatPage() {
     setTimeout(() => {
       const aiMessage = {
         sender: 'ai',
-        text: `You asked about: "${userMessage.text}". Here's a brief legal insight on that... (Dummy reply)`
+        text: `You said: "${userMessage.text}". Here’s a legal insight...`
       };
       setMessages(prev => [...prev, aiMessage]);
       setIsLoading(false);
     }, 1000);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') sendMessage();
-  };
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4F8FF] text-[${lawverseText}]">
-
-      {/* Header Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md sticky top-0 z-10">
-        <div className="flex items-center gap-2 text-lg font-bold text-[${lawverseBlue}]">
-          <FaBars className="cursor-pointer" />
-          Lawverse™ Chat
-        </div>
-        <button className="bg-[${lawverseBlue}] text-white px-3 py-1 rounded-full text-sm hover:opacity-90">
-          New Chat <FaPlus className="inline ml-1" />
+    <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col">
+      {/* Top Bar */}
+      <div className="flex items-center justify-between p-4 bg-[#0F172A] shadow-md">
+        <button className="flex items-center gap-2 text-white hover:text-blue-400">
+          <FaArrowLeft />
+          <span>Back</span>
         </button>
+        <h1 className="text-xl font-bold text-blue-400">Lawverse™ Chat</h1>
+        <button className="hover:text-red-400"><FiTrash2 /></button>
       </div>
 
-      {/* Chat Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-600">
-            <h2 className="text-2xl mb-4">How can I assist you?</h2>
-            <div className="flex flex-wrap justify-center gap-2">
-              {initialSuggestions.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => setInput(item)}
-                  className="bg-white text-[${lawverseBlue}] border border-[${lawverseBlue}] px-4 py-2 rounded-full hover:bg-[${lawverseBlue}] hover:text-white transition"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
+      {/* Chat Box */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`max-w-xl p-3 rounded-xl text-sm leading-relaxed shadow-md ${
+              msg.sender === 'user'
+                ? 'bg-[#1E293B] self-end ml-auto text-right'
+                : 'bg-[#1E40AF] self-start text-left'
+            }`}
           >
-            <div
-              className={`max-w-[80%] px-4 py-2 rounded-xl text-sm relative ${
-                msg.sender === 'user'
-                  ? 'bg-[${lawverseBlue}] text-white rounded-br-none'
-                  : 'bg-white text-[${lawverseText}] rounded-bl-none shadow'
-              }`}
-            >
-              {msg.text}
-              {msg.sender === 'ai' && (
-                <div className="mt-1 flex gap-2 text-xs text-gray-400">
-                  <FaThumbsUp className="cursor-pointer hover:text-[${lawverseBlue}]" />
-                  <FaThumbsDown className="cursor-pointer hover:text-red-500" />
-                  <FaRegCopy className="cursor-pointer hover:text-green-500" />
-                </div>
-              )}
-            </div>
+            {msg.text}
           </div>
         ))}
-
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-white px-4 py-2 rounded-xl shadow text-sm text-gray-500 animate-pulse">
-              Typing...
-            </div>
+          <div className="bg-[#1E40AF] p-3 rounded-xl text-sm max-w-xs animate-pulse">
+            Lawverse™ is typing...
           </div>
         )}
-
         <div ref={messagesEndRef}></div>
       </div>
 
-      {/* Input Area */}
-      <div className="flex items-center px-4 py-3 border-t bg-white gap-2">
-        <div className="flex gap-2">
-          <button className="text-[${lawverseBlue}] text-xl">
-            <FaMicrophone />
-          </button>
-          <button className="text-[${lawverseBlue}] text-xl">
-            <FaImage />
-          </button>
-          <button className="text-[${lawverseBlue}] text-xl">
-            <FaFilePdf />
-          </button>
+      {/* Predefined Buttons */}
+      {messages.length === 1 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-[#0F172A] text-white">
+          {['Criminal Law', 'Startup Law', 'Property Law', 'Fundraising Law'].map(topic => (
+            <button
+              key={topic}
+              onClick={() => setInput(topic)}
+              className="bg-[#1E293B] hover:bg-blue-700 px-3 py-2 rounded-xl text-sm shadow"
+            >
+              {topic}
+            </button>
+          ))}
         </div>
+      )}
+
+      {/* Chat Input Area */}
+      <div className="bg-[#0F172A] p-4 flex items-center gap-2">
+        {/* Left Buttons */}
+        <div className="flex gap-2 text-blue-400">
+          <button><FaUpload /></button>
+          <button><FaFilePdf /></button>
+          <button><FaMicrophone /></button>
+        </div>
+
+        {/* Input */}
         <input
+          type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
           placeholder="Type your message..."
-          className="flex-1 px-4 py-2 border border-gray-200 rounded-full outline-none bg-[#F4F8FF] text-[${lawverseText}]"
+          className="flex-1 rounded-xl bg-[#1E293B] text-white px-4 py-2 outline-none border border-[#334155]"
         />
+
+        {/* Send Button */}
         <button
-          onClick={sendMessage}
-          className="bg-[${lawverseBlue}] text-white p-2 rounded-full text-lg hover:opacity-90"
+          onClick={handleSend}
+          className="text-blue-500 hover:text-blue-300 text-xl"
         >
-          <FaRegPaperPlane />
+          <FaPaperPlane />
         </button>
       </div>
     </div>
   );
-}
+          }
