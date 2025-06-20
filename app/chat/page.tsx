@@ -1,136 +1,107 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaMicrophone, FaUpload, FaFilePdf, FaBars } from 'react-icons/fa';
-import { FiTrash2 } from 'react-icons/fi';
-import { BsStars, BsArrowRepeat } from 'react-icons/bs';
-import { AiOutlineLike, AiOutlineDislike, AiOutlineCopy } from 'react-icons/ai';
+import React, { useState, useRef, useEffect } from "react"; import { FaPaperPlane, FaMicrophone, FaUpload, FaFilePdf } from "react-icons/fa"; import { BsStars } from "react-icons/bs"; import { FiMenu } from "react-icons/fi";
 
-export default function ChatPage() {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const chatContainerRef = useRef(null);
+const ChatPage = () => { const [messages, setMessages] = useState([]); const [input, setInput] = useState(""); const [showSidebar, setShowSidebar] = useState(false); const chatEndRef = useRef(null);
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
+const handleSend = () => { if (!input.trim()) return; const userMsg = { sender: "user", text: input }; setMessages((prev) => [...prev, userMsg]); setInput("");
 
-  const handleSend = () => {
-    if (input.trim() === "") return;
-    const userMsg = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setIsLoading(true);
-    setHasInteracted(true);
+// Dummy AI response
+setTimeout(() => {
+  const aiMsg = { sender: "ai", text: "Thanks for your message!" };
+  setMessages((prev) => [...prev, aiMsg]);
+}, 600);
 
-    setTimeout(() => {
-      const aiMsg = { sender: "ai", text: "This is a sample response from Lawverse™." };
-      setMessages((prev) => [...prev, aiMsg]);
-      setIsLoading(false);
-    }, 1000);
-  };
+};
 
-  const handleIconClick = (action, msg) => {
-    if (action === "copy") navigator.clipboard.writeText(msg.text);
-    if (action === "regenerate") handleSend();
-    // like/dislike can be tracked later
-  };
+useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0B1A2E] to-[#0C223E] text-white flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-        <button onClick={() => setShowMenu(!showMenu)} className="text-white">
-          <FaBars size={20} />
-        </button>
-        <h1 className="text-xl font-semibold text-white flex items-center gap-2">
-          <BsStars className="text-blue-400 animate-pulse" /> Lawverse™
-        </h1>
-        <div></div>
-      </div>
+return ( <div className="flex flex-col h-screen w-full bg-[#0f172a] text-white"> {/* Header */} <div className="flex justify-between items-center p-4 border-b border-gray-700"> <button onClick={() => setShowSidebar(!showSidebar)}> <FiMenu size={26} /> </button> <h1 className="text-xl font-semibold tracking-wide">Lawverse™ Chat</h1> <BsStars size={26} /> </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {showMenu && (
-          <div className="w-64 bg-[#102C4E] text-white p-4 border-r border-gray-700">
-            <h2 className="text-lg font-semibold mb-4">Menu</h2>
-            <ul className="space-y-2">
-              <li className="hover:text-blue-400 cursor-pointer">Home</li>
-              <li className="hover:text-blue-400 cursor-pointer">About</li>
-              <li className="hover:text-blue-400 cursor-pointer">Contact</li>
-              <li className="hover:text-blue-400 cursor-pointer">Chat History</li>
-            </ul>
-          </div>
-        )}
-
-        <div className="flex-1 flex flex-col justify-between">
-          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
-            {!hasInteracted && (
-              <div className="text-center">
-                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-200 mb-4">
-                  Hello! How can I assist you?
-                </h2>
-                <div className="flex justify-center gap-4 flex-wrap">
-                  {["Criminal Law", "Startup Law", "Civil Rights", "Property Law"].map((topic) => (
-                    <button
-                      key={topic}
-                      className="px-4 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg border border-white border-opacity-10"
-                      onClick={() => setInput(topic)}
-                    >
-                      {topic}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`max-w-2xl mx-auto px-4 py-3 rounded-xl relative text-sm shadow-lg transition-all duration-300 ${
-                  msg.sender === "user"
-                    ? "bg-blue-900 text-right ml-auto"
-                    : "bg-[#1E3557] text-left"
-                }`}
-              >
-                {msg.text}
-                {msg.sender === "ai" && (
-                  <div className="flex gap-3 mt-2 text-xs text-gray-400 absolute -bottom-6 left-2">
-                    <button onClick={() => handleIconClick("copy", msg)}><AiOutlineCopy /></button>
-                    <button><AiOutlineLike /></button>
-                    <button><AiOutlineDislike /></button>
-                    <button onClick={() => handleIconClick("regenerate", msg)}><BsArrowRepeat /></button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="border-t border-gray-700 p-4 bg-[#0C223E]">
-            <div className="flex items-center gap-2">
-              <button className="text-blue-300 hover:text-white"><FaMicrophone /></button>
-              <button className="text-blue-300 hover:text-white"><FaUpload /></button>
-              <button className="text-blue-300 hover:text-white"><FaFilePdf /></button>
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Type your message..."
-                className="flex-1 bg-white bg-opacity-5 text-white px-4 py-2 rounded-lg placeholder-gray-400 focus:outline-none"
-              />
-              <button
-                onClick={handleSend}
-                className="bg-blue-600 p-2 rounded-lg text-white hover:bg-blue-700"
-              >
-                <FaPaperPlane />
-              </button>
-            </div>
-          </div>
-        </div>
+{/* Optional Sidebar */}
+  {showSidebar && (
+    <div className="absolute top-16 left-0 bg-[#1e293b] text-white w-64 h-full p-4 z-50">
+      <div className="space-y-4">
+        <button className="block w-full text-left">🏠 Home</button>
+        <button className="block w-full text-left">ℹ️ About</button>
+        <button className="block w-full text-left">📝 Chat History</button>
       </div>
     </div>
-  );
-                      }
+  )}
+
+  {/* Chat Messages */}
+  <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+    {messages.length === 0 && (
+      <div className="text-center text-lg text-gray-300">
+        <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-500 to-blue-300 inline-block text-transparent bg-clip-text">
+          How can I assist you?
+        </h2>
+        <div className="flex justify-center gap-3 flex-wrap">
+          {["Criminal Law", "Startup Law", "Fundraising", "Property Rights"].map((item) => (
+            <button
+              key={item}
+              onClick={() => setInput(item)}
+              className="bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-xl text-sm"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {messages.map((msg, idx) => (
+      <div key={idx} className={`w-full flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+        <div
+          className={`inline-block px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] break-words shadow-md ${
+            msg.sender === "user"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 text-gray-900"
+          }`}
+        >
+          {msg.text}
+        </div>
+      </div>
+    ))}
+    <div ref={chatEndRef} />
+  </div>
+
+  {/* Input */}
+  <div className="w-full border-t border-gray-700 bg-[#0f172a] p-4">
+    <div className="flex items-center gap-3">
+      {/* Left Icons */}
+      <div className="flex gap-2">
+        <button className="text-white hover:text-blue-400">
+          <FaUpload size={24} />
+        </button>
+        <button className="text-white hover:text-blue-400">
+          <FaFilePdf size={24} />
+        </button>
+        <button className="text-white hover:text-blue-400">
+          <FaMicrophone size={24} />
+        </button>
+      </div>
+
+      {/* Input Field */}
+      <input
+        type="text"
+        className="flex-1 bg-white text-black px-4 py-2 rounded-xl placeholder-gray-500 w-[65%]"
+        placeholder="Type your message..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+      />
+
+      {/* Send Button */}
+      <button onClick={handleSend} className="text-white hover:text-blue-400">
+        <FaPaperPlane size={24} />
+      </button>
+    </div>
+  </div>
+</div>
+
+); };
+
+export default ChatPage;
+
+                                                                                                                                                                                   
