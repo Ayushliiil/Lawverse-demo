@@ -1,119 +1,94 @@
+/* app/chat/page.tsx */
+
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Mic, Image, Upload, RefreshCcw, Copy, ThumbsUp, ThumbsDown, Send } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react'; import { Mic, ImageIcon, Upload, Send, FileText, RefreshCcw, ThumbsUp, ThumbsDown, Copy } from 'lucide-react'; import { cn } from '@/lib/utils';
 
-// Define type
-type Message = {
-  sender: 'user' | 'ai';
-  text: string;
-};
+const DEFAULT_SUGGESTIONS = [ 'Criminal Law', 'Startup Law', 'Human Rights', 'Legal Contracts', 'Property Law' ];
 
-const presetPrompts = ['Criminal Law', 'Startup Law', 'Cyber Law', 'Property Disputes', 'Legal Rights'];
+export default function ChatPage() { const [messages, setMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([]); const [input, setInput] = useState(''); const [isLoading, setIsLoading] = useState(false); const chatRef = useRef<HTMLDivElement>(null);
 
-export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+useEffect(() => { const saved = localStorage.getItem('lawverse-chat'); if (saved) setMessages(JSON.parse(saved)); }, []);
 
-  useEffect(() => {
-    const stored = localStorage.getItem('lawverse_chat');
-    if (stored) setMessages(JSON.parse(stored));
-  }, []);
+useEffect(() => { localStorage.setItem('lawverse-chat', JSON.stringify(messages)); if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [messages]);
 
-  useEffect(() => {
-    localStorage.setItem('lawverse_chat', JSON.stringify(messages));
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+const handleSend = () => { if (input.trim() === '') return; const userMsg = { sender: 'user', text: input }; setMessages((prev) => [...prev, userMsg]); setInput(''); setIsLoading(true); setTimeout(() => { const aiMsg = { sender: 'ai', text: This is a dummy response for: "${userMsg.text}". }; setMessages((prev) => [...prev, aiMsg]); setIsLoading(false); }, 1500); };
 
-  const handleSend = () => {
-    if (input.trim() === '') return;
+const handleSuggestion = (text: string) => { setInput(text); };
 
-    const userMsg: Message = { sender: 'user', text: input };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
+return ( <div className="flex flex-col h-screen bg-gradient-to-b from-[#0a0e2a] to-[#0c102f] text-white"> <div className="flex items-center justify-between px-4 py-3 border-b border-blue-900 shadow-sm"> <h1 className="text-xl font-semibold tracking-wide text-white">Lawverse™</h1> <button className="bg-blue-700 hover:bg-blue-800 px-4 py-1.5 rounded-lg text-sm">Go to Home</button> </div>
 
-    setTimeout(() => {
-      const aiMsg: Message = {
-        sender: 'ai',
-        text: `Here's some legal information on "${userMsg.text}". (Dummy response for now)`
-      };
-      setMessages(prev => [...prev, aiMsg]);
-      setIsLoading(false);
-    }, 1200);
-  };
-
-  return (
-    <div className="bg-[#f4f6fc] min-h-screen flex flex-col px-2 md:px-10 pt-6 overflow-x-hidden">
-      <div className="max-w-3xl mx-auto w-full">
-        {messages.length === 0 && (
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-[#031926] mb-3">How can I assist you?</h2>
-            <div className="flex flex-wrap gap-3 justify-center">
-              {presetPrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => setInput(prompt)}
-                  className="bg-[#031926] text-white px-4 py-2 rounded-full text-sm shadow hover:bg-opacity-90"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-4 mb-24">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+<div ref={chatRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+    {messages.length === 0 && (
+      <div className="text-center text-lg text-blue-100 space-y-4 animate-fade-in">
+        <p className="text-2xl font-semibold text-white">How can I assist you today?</p>
+        <div className="flex flex-wrap gap-3 justify-center">
+          {DEFAULT_SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              onClick={() => handleSuggestion(s)}
+              className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-full text-sm"
             >
-              <div
-                className={`max-w-[80%] rounded-xl p-4 shadow-sm text-sm whitespace-pre-wrap ${
-                  msg.sender === 'user'
-                    ? 'bg-[#031926] text-white rounded-tr-none'
-                    : 'bg-[#e0e9f1] text-[#031926] rounded-tl-none border'
-                }`}
-              >
-                {msg.text}
-                {msg.sender === 'ai' && (
-                  <div className="flex gap-3 mt-2 text-gray-400 text-xs">
-                    <button title="Copy"><Copy size={14} /></button>
-                    <button title="Like"><ThumbsUp size={14} /></button>
-                    <button title="Dislike"><ThumbsDown size={14} /></button>
-                    <button title="Regenerate"><RefreshCcw size={14} /></button>
-                  </div>
-                )}
-              </div>
-            </div>
+              {s}
+            </button>
           ))}
-          <div ref={chatEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="fixed bottom-4 left-0 w-full px-4">
-          <div className="max-w-3xl mx-auto flex items-center bg-white shadow-md rounded-full border px-4 py-2 gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              className="flex-1 outline-none text-[#031926] placeholder:text-gray-500 text-sm"
-              placeholder="Type your message..."
-            />
-            <div className="flex gap-2 text-[#031926]">
-              <button title="Voice"><Mic size={20} /></button>
-              <button title="Image"><Image size={20} /></button>
-              <button title="Upload File"><Upload size={20} /></button>
-              <button title="Send" onClick={handleSend}><Send size={20} className="text-[#031926]" /></button>
-            </div>
-          </div>
         </div>
       </div>
+    )}
+
+    {messages.map((msg, i) => (
+      <div
+        key={i}
+        className={cn(
+          'flex flex-col max-w-xl space-y-1 rounded-xl px-4 py-3 text-sm',
+          msg.sender === 'user' ? 'self-end bg-blue-600 text-white' : 'self-start bg-[#141a38] text-blue-100'
+        )}
+      >
+        <p>{msg.text}</p>
+        {msg.sender === 'ai' && (
+          <div className="flex gap-2 text-xs mt-1 text-gray-400">
+            <ThumbsUp className="w-4 h-4 hover:text-white cursor-pointer" />
+            <ThumbsDown className="w-4 h-4 hover:text-white cursor-pointer" />
+            <Copy className="w-4 h-4 hover:text-white cursor-pointer" />
+            <RefreshCcw className="w-4 h-4 hover:text-white cursor-pointer" />
+          </div>
+        )}
+      </div>
+    ))}
+
+    {isLoading && (
+      <div className="self-start bg-[#141a38] px-4 py-3 rounded-xl max-w-xl animate-pulse text-sm">
+        Lawverse™ is typing...
+      </div>
+    )}
+  </div>
+
+  <div className="border-t border-blue-900 bg-[#0c102f] px-4 py-3">
+    <div className="flex items-center gap-2">
+      <div className="flex gap-1">
+        <Mic className="w-5 h-5 cursor-pointer hover:text-blue-400" title="Voice" />
+        <ImageIcon className="w-5 h-5 cursor-pointer hover:text-blue-400" title="Image Upload" />
+        <Upload className="w-5 h-5 cursor-pointer hover:text-blue-400" title="PDF / File Upload" />
+        <FileText className="w-5 h-5 cursor-pointer hover:text-blue-400" title="Text to Speech" />
+      </div>
+
+      <input
+        type="text"
+        placeholder="Type your message..."
+        className="flex-1 bg-[#10152d] text-white border border-blue-800 px-4 py-2 rounded-full placeholder-gray-400 focus:outline-none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+      />
+
+      <Send
+        onClick={handleSend}
+        className="w-5 h-5 text-blue-400 hover:text-white cursor-pointer ml-1"
+        title="Send"
+      />
     </div>
-  );
-                         }
-                
+  </div>
+</div>
+
+); }
+
