@@ -1,142 +1,152 @@
-'use client';
+/* Updated Chat UI with Lawverse™ brand colors */
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  FaPaperPlane,
-  FaMicrophone,
-  FaUpload,
-  FaFilePdf,
-  FaBars,
-} from 'react-icons/fa';
-import { BsStars } from 'react-icons/bs';
+import React, { useState, useRef, useEffect } from "react";
+import { FaPaperPlane, FaMicrophone, FaUpload, FaFilePdf, FaBars } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
+import { BsStars, BsArrowRepeat } from "react-icons/bs";
+import Link from "next/link";
 
-const ChatPage = () => {
+export default function ChatPage() {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const chatContainerRef = useRef(null);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const chatEndRef = useRef(null);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const userMessage = { sender: 'user', text: input };
-    const aiMessage = {
-      sender: 'ai',
-      text: 'Thanks for your message! Lawverse™ will reply soon...',
-    };
-    setMessages((prev) => [...prev, userMessage, aiMessage]);
-    setInput('');
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
+    scrollToBottom();
   }, [messages]);
 
-  const initialOptions = [
-    'Criminal Law',
-    'Startup Law',
-    'Property Law',
-    'Fundraising Legal Help',
-  ];
-
-  const insertOption = (text: string) => {
-    setInput(text);
+  const sendMessage = () => {
+    if (input.trim() === "") return;
+    const userMsg = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
+    setIsLoading(true);
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: `This is a dummy response to: "${userMsg.text}"`,
+        },
+      ]);
+      setIsLoading(false);
+    }, 1000);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0f24] to-[#101628] text-white flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1f30] bg-[#0e132b] shadow-md">
-        <div className="flex items-center space-x-2 text-white">
-          <FaBars size={20} />
-          <span className="text-sm font-semibold">Menu</span>
-        </div>
-        <div className="text-white font-semibold text-lg tracking-wide">
-          Lawverse™ Chat
-        </div>
-        <BsStars size={20} className="text-blue-300" />
-      </div>
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
-      {/* Prompt + Options */}
+  const QuickOptions = [
+    "Criminal Law",
+    "Startup Law",
+    "Constitution",
+    "Civil Rights",
+  ];
+
+  return (
+    <div className="bg-[#0a0a0a] min-h-screen text-white flex flex-col">
+      {/* Header */}
+      <header className="w-full bg-[#08182f] p-4 flex justify-between items-center shadow-lg z-50">
+        <div className="text-xl font-bold tracking-wider text-[#00c2ff]">
+          Lawverse™
+        </div>
+        <nav className="flex gap-4 text-sm font-medium">
+          <Link href="/" className="hover:text-[#00c2ff]">Home</Link>
+          <Link href="/chat" className="hover:text-[#00c2ff]">Try Chat</Link>
+          <Link href="/about" className="hover:text-[#00c2ff]">About</Link>
+          <Link href="/invest" className="hover:text-[#00c2ff]">Invest</Link>
+        </nav>
+      </header>
+
+      {/* Welcome Message */}
       {messages.length === 0 && (
-        <div className="text-center py-10 px-4">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#27c4ff] to-[#4a8df9] text-transparent bg-clip-text animate-pulse mb-6">
+        <div className="flex flex-col items-center justify-center pt-10">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#00c2ff] to-[#004f87] text-transparent bg-clip-text animate-pulse">
             How can I assist you?
           </h1>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 justify-center px-4">
-            {initialOptions.map((opt, idx) => (
+          <div className="flex flex-wrap gap-2 mt-6 justify-center">
+            {QuickOptions.map((option, index) => (
               <button
-                key={idx}
-                onClick={() => insertOption(opt)}
-                className="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-xl backdrop-blur-md transition-all duration-300"
+                key={index}
+                onClick={() => setInput(option)}
+                className="border border-[#00c2ff] text-white bg-transparent px-4 py-2 rounded-xl text-sm hover:bg-[#00c2ff33]"
               >
-                {opt}
+                {option}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Messages */}
-      <div
-        ref={chatContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth"
-      >
-        {messages.map((msg, i) => (
+      {/* Chat Container */}
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28 space-y-4">
+        {messages.map((msg, index) => (
           <div
-            key={i}
-            className={`flex ${
-              msg.sender === 'user' ? 'justify-end' : 'justify-start'
+            key={index}
+            className={`max-w-3xl text-sm md:text-base w-fit px-4 py-3 rounded-2xl ${
+              msg.sender === "user"
+                ? "bg-[#00c2ff] text-black self-end ml-auto"
+                : "bg-[#001f3f] text-white self-start"
             }`}
           >
-            <div
-              className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow ${
-                msg.sender === 'user'
-                  ? 'bg-[#2a5ab9] text-white'
-                  : 'bg-[#1e1f2e] text-gray-200'
-              }`}
-            >
-              {msg.text}
-            </div>
+            {msg.text}
           </div>
         ))}
+        <div ref={chatEndRef}></div>
       </div>
 
-      {/* Input */}
-      <div className="bg-[#0f1224] border-t border-[#1a1f30] px-4 py-3 flex items-center space-x-3">
-        {/* Left icons */}
-        <div className="flex space-x-3 items-center">
-          <label className="cursor-pointer">
-            <FaUpload className="text-blue-400 hover:text-blue-500" size={18} />
-            <input type="file" hidden />
-          </label>
-          <button>
-            <FaMicrophone className="text-blue-400 hover:text-blue-500" size={18} />
+      {/* Chat Input Area */}
+      <div className="fixed bottom-0 left-0 w-full bg-[#08182f] px-4 py-3 border-t border-[#003c66] flex items-center justify-between gap-2 z-50">
+        {/* Left Icons */}
+        <div className="flex gap-3">
+          <button className="text-white hover:text-[#00c2ff]">
+            <FaUpload size={18} />
           </button>
-          <button>
-            <FaFilePdf className="text-blue-400 hover:text-blue-500" size={18} />
+          <button className="text-white hover:text-[#00c2ff]">
+            <FaMicrophone size={18} />
+          </button>
+          <button className="text-white hover:text-[#00c2ff]">
+            <FaFilePdf size={18} />
           </button>
         </div>
 
-        {/* Input field */}
-        <input
-          type="text"
+        {/* Input Field */}
+        <textarea
+          rows={1}
           placeholder="Type your message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 bg-[#1c1e2f] text-white placeholder-gray-400 px-4 py-2 rounded-full focus:outline-none"
-        />
+          onKeyDown={handleKeyDown}
+          className="flex-1 resize-none rounded-lg px-4 py-2 bg-[#0a0a0a] text-white border border-[#003c66] focus:outline-none"
+        ></textarea>
 
-        {/* Send button */}
-        <button
-          onClick={handleSend}
-          className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-all duration-300"
-        >
-          <FaPaperPlane size={16} />
-        </button>
+        {/* Right Icons */}
+        <div className="flex gap-2 ml-2">
+          <button
+            onClick={sendMessage}
+            className="bg-[#00c2ff] hover:bg-[#009ee3] text-black p-2 rounded-full"
+          >
+            <FaPaperPlane size={16} />
+          </button>
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer className="text-center text-xs text-gray-400 bg-[#000d1a] p-2 border-t border-[#003c66]">
+        © {new Date().getFullYear()} Lawverse™. All rights reserved. | Terms | Privacy
+      </footer>
     </div>
   );
-};
+}
 
-export default ChatPage;
+        
