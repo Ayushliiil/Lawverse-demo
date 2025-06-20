@@ -1,115 +1,131 @@
+// page.tsx — refined Lawverse™ Chat UI
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { FaStar, FaHome, FaInfoCircle, FaComments, FaTrash } from 'react-icons/fa';
-import { HiOutlineArrowPath } from 'react-icons/hi2';
-import { FiCopy, FiThumbsUp, FiThumbsDown, FiMic, FiUpload } from 'react-icons/fi';
-import { AiOutlineSend, AiOutlineFilePdf } from 'react-icons/ai';
-import Link from 'next/link';
+import React, { useState, useRef, useEffect } from "react";
+import { FaMicrophone, FaPaperPlane, FaUpload, FaFilePdf } from "react-icons/fa6";
+import { IoMdMenu } from "react-icons/io";
+import { FiCopy, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
+import { BsStars, BsArrowRepeat } from "react-icons/bs";
 
-export default function ChatPage() {
+const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim()) return;
-    const newMessage = { sender: "user", text: input };
-    setMessages(prev => [...prev, newMessage]);
+    if (input.trim() === "") return;
+    const userMsg = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+
     setTimeout(() => {
-      const aiReply = { sender: "ai", text: `This is a response to: ${input}` };
-      setMessages(prev => [...prev, aiReply]);
+      const aiMsg = {
+        sender: "ai",
+        text: `This is a placeholder response for: "${input}"`,
+      };
+      setMessages((prev) => [...prev, aiMsg]);
       setIsLoading(false);
     }, 1200);
   };
 
-  const starterOptions = ["Criminal Law", "Startup Law", "Property Rights", "Fundraising Law"];
+  const handleOptionClick = (text) => {
+    setInput(text);
+  };
 
   return (
-    <div className="flex h-screen bg-[#0b1529] text-white">
-      {/* Sidebar */}
-      <div className="w-64 bg-[#0f1e3a] p-4 hidden sm:block">
-        <h1 className="text-xl font-bold mb-4">☰ Menu</h1>
-        <nav className="flex flex-col gap-2">
-          <Link href="/" className="flex items-center gap-2 text-[#70a1ff] hover:underline"><FaHome /> Home</Link>
-          <Link href="/about" className="flex items-center gap-2 text-[#70a1ff] hover:underline"><FaInfoCircle /> About</Link>
-          <Link href="/chat" className="flex items-center gap-2 text-[#70a1ff] hover:underline"><FaComments /> Chat</Link>
-        </nav>
-        <div className="mt-6">
-          <h2 className="text-sm font-semibold">Chat History</h2>
-          <ul className="text-sm mt-2 text-gray-400">
-            <li>• Criminal Law Chat</li>
-            <li>• Startup Query</li>
-            <li>• Property Rights</li>
-          </ul>
-        </div>
-      </div>
+    <main className="flex flex-col min-h-screen bg-gradient-to-b from-[#0a0f1d] to-[#0e1628] text-white">
+      <header className="flex justify-between items-center p-4 border-b border-white/10">
+        <button className="text-white text-2xl">
+          <IoMdMenu />
+        </button>
+        <h1 className="text-xl font-bold flex items-center gap-2">
+          Lawverse™
+          <BsStars className="text-blue-400 animate-pulse" />
+        </h1>
+      </header>
 
-      {/* Main Chat Section */}
-      <div className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between bg-[#0f1e3a] p-4 shadow">
-          <h1 className="text-2xl font-bold">Lawverse™</h1>
-          <FaStar className="text-[#70a1ff] text-2xl animate-pulse" title="Gemena AI Mode" />
-        </header>
-
-        <div className="flex-1 p-4 overflow-y-auto">
-          {messages.length === 0 && (
-            <div className="text-center mt-12">
-              <h2 className="text-3xl font-bold text-white bg-gradient-to-r from-[#1e3c72] to-[#2a5298] p-2 rounded-lg mb-4 animate-fade">How can I assist you?</h2>
-              <div className="flex flex-wrap justify-center gap-3">
-                {starterOptions.map((opt, i) => (
-                  <button key={i} onClick={() => setInput(opt)} className="bg-[#1e3c72] bg-opacity-40 border border-[#70a1ff] text-[#70a1ff] px-4 py-2 rounded-full text-sm hover:bg-opacity-60 transition">
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {messages.map((msg, i) => (
-            <div key={i} className={`max-w-xl my-2 p-3 rounded-xl ${msg.sender === 'user' ? 'ml-auto bg-[#1e3c72]' : 'mr-auto bg-[#2a5298]'}`}>
-              <p>{msg.text}</p>
-              <div className="flex gap-2 mt-2 text-sm text-gray-300">
-                <button title="Copy"><FiCopy /></button>
-                <button title="Like"><FiThumbsUp /></button>
-                <button title="Dislike"><FiThumbsDown /></button>
-                <button title="Speak"><FiMic /></button>
-                <button title="Regenerate"><HiOutlineArrowPath /></button>
-              </div>
-            </div>
+      <div className="flex flex-col px-4 py-6 gap-2">
+        <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+          How can I assist you?
+        </h2>
+        <div className="flex gap-2 flex-wrap mt-2">
+          {["Criminal Law", "Startup Law", "Civil Rights", "Legal Drafting"].map((law, i) => (
+            <button
+              key={i}
+              onClick={() => handleOptionClick(law)}
+              className="px-3 py-1 bg-white/10 border border-white/20 text-sm rounded-full hover:bg-white/20 transition"
+            >
+              {law}
+            </button>
           ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Section */}
-        <div className="p-4 border-t border-[#2a2a2a] bg-[#0f1e3a]">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-2">
-              <button title="Upload"><FiUpload className="text-xl text-[#70a1ff]" /></button>
-              <button title="Upload PDF"><AiOutlineFilePdf className="text-xl text-[#70a1ff]" /></button>
-              <button title="Voice Input"><FiMic className="text-xl text-[#70a1ff]" /></button>
-            </div>
-            <input
-              type="text"
-              className="flex-1 px-4 py-2 rounded-xl bg-[#1e1e2f] text-white placeholder-gray-400 focus:outline-none"
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            />
-            <button onClick={handleSend} className="text-2xl text-[#70a1ff]"><AiOutlineSend /></button>
-          </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-              
+      <section className="flex-1 overflow-y-auto px-4 pb-24">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`my-2 flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-[75%] px-4 py-2 rounded-2xl shadow-md text-sm relative ${
+                msg.sender === "user"
+                  ? "bg-gradient-to-br from-blue-600 to-blue-800 text-white"
+                  : "bg-white/10 text-white"
+              }`}
+            >
+              {msg.text}
+              {msg.sender === "ai" && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 text-white/60 text-xs">
+                  <FiCopy className="cursor-pointer hover:text-white" />
+                  <FiThumbsUp className="cursor-pointer hover:text-white" />
+                  <FiThumbsDown className="cursor-pointer hover:text-white" />
+                  <BsArrowRepeat className="cursor-pointer hover:text-white" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </section>
+
+      <footer className="fixed bottom-0 left-0 w-full bg-[#0b111f] px-4 py-3 border-t border-white/10">
+        <div className="flex gap-2 items-center">
+          <div className="flex gap-2">
+            <button className="text-white/70 hover:text-white">
+              <FaUpload className="text-xl" />
+            </button>
+            <button className="text-white/70 hover:text-white">
+              <FaFilePdf className="text-xl" />
+            </button>
+            <button className="text-white/70 hover:text-white">
+              <FaMicrophone className="text-xl" />
+            </button>
+          </div>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Type your message..."
+            className="flex-1 bg-white/5 px-4 py-2 text-sm rounded-full text-white placeholder-white/50 focus:outline-none"
+          />
+          <button
+            onClick={handleSend}
+            className="text-blue-400 hover:text-white text-xl px-2"
+          >
+            <FaPaperPlane />
+          </button>
+        </div>
+      </footer>
+    </main>
+  );
+};
+
+export default Chat;
